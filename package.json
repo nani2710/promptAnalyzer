@@ -1,0 +1,25 @@
+{
+  "name": "prompt-analyzer-mvp",
+  "version": "0.1.0",
+  "description": "Prompt Analyzer - A tool to evaluate and improve AI prompts",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "prompt",
+    "ai",
+    "analyzer",
+    "optimization"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

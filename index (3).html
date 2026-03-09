@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Analyzer - Claude Optimizer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>🚀 Prompt Analyzer</h1>
+            <p>Analyze & Improve Your AI Prompts for Maximum Accuracy</p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Input Section -->
+            <section class="input-section">
+                <h2>Paste Your Prompt</h2>
+                <textarea 
+                    id="promptInput" 
+                    class="prompt-input" 
+                    placeholder="Paste your AI prompt here..."
+                    rows="6"
+                ></textarea>
+
+                <!-- Model & Category Selection -->
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="modelSelect">Target AI Model:</label>
+                        <select id="modelSelect">
+                            <option value="claude">Claude (Recommended)</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="categorySelect">Category:</label>
+                        <select id="categorySelect">
+                            <option value="auto">Auto-Detect</option>
+                            <option value="creative">Creative Tasks</option>
+                            <option value="technical">Technical/Analytical</option>
+                            <option value="research">Research/Informational</option>
+                            <option value="conversational">Conversational/Role-Play</option>
+                            <option value="productivity">Productivity</option>
+                            <option value="educational">Educational</option>
+                            <option value="fun">Fun/Experimental</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Analyze Button -->
+                <button id="analyzeBtn" class="btn btn-primary">
+                    📊 Analyze Prompt
+                </button>
+            </section>
+
+            <!-- Results Section (Hidden until analysis) -->
+            <section id="resultsSection" class="results-section hidden">
+                <!-- Overall Score -->
+                <div class="score-card">
+                    <div class="score-display">
+                        <span class="score-number" id="overallScore">0</span>
+                        <span class="score-label">/100</span>
+                    </div>
+                    <div class="score-bar">
+                        <div class="score-fill" id="scoreBar"></div>
+                    </div>
+                </div>
+
+                <!-- Detected Category -->
+                <div class="info-box">
+                    <h3>Detected Information</h3>
+                    <p><strong>Category:</strong> <span id="detectedCategory">-</span></p>
+                    <p><strong>Model:</strong> <span id="detectedModel">Claude</span></p>
+                </div>
+
+                <!-- Scoring Breakdown -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-label">Clarity</div>
+                        <div class="metric-score" id="clarityScore">0%</div>
+                        <div class="metric-bar">
+                            <div class="metric-fill" id="clarityBar"></div>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-label">Specificity</div>
+                        <div class="metric-score" id="specificityScore">0%</div>
+                        <div class="metric-bar">
+                            <div class="metric-fill" id="specificityBar"></div>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-label">Context</div>
+                        <div class="metric-score" id="contextScore">0%</div>
+                        <div class="metric-bar">
+                            <div class="metric-fill" id="contextBar"></div>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-label">Constraints</div>
+                        <div class="metric-score" id="constraintsScore">0%</div>
+                        <div class="metric-bar">
+                            <div class="metric-fill" id="constraintsBar"></div>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-label">Structure</div>
+                        <div class="metric-score" id="structureScore">0%</div>
+                        <div class="metric-bar">
+                            <div class="metric-fill" id="structureBar"></div>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-label">Completeness</div>
+                        <div class="metric-score" id="completenessScore">0%</div>
+                        <div class="metric-bar">
+                            <div class="metric-fill" id="completenessBar"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Issues Detected -->
+                <div class="issues-box">
+                    <h3>🔴 Issues Detected</h3>
+                    <div id="issuesList" class="issues-list">
+                        <!-- Issues will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Suggestions -->
+                <div class="suggestions-box">
+                    <h3>✨ Suggested Improvement</h3>
+                    <div id="suggestionText" class="suggestion-text">
+                        <!-- Suggestion will be populated here -->
+                    </div>
+                    <button class="btn btn-secondary" id="copySuggestionBtn">
+                        📋 Copy Suggestion
+                    </button>
+                </div>
+
+                <!-- Claude-Specific Tips -->
+                <div class="tips-box">
+                    <h3>💡 Claude-Specific Tips</h3>
+                    <ul id="claudeTips">
+                        <!-- Tips will be populated here -->
+                    </ul>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" id="useImprovedBtn">
+                        Use This Improvement
+                    </button>
+                    <button class="btn btn-secondary" id="resetBtn">
+                        Analyze Another
+                    </button>
+                </div>
+            </section>
+
+            <!-- Loading State -->
+            <div id="loadingState" class="loading-state hidden">
+                <div class="spinner"></div>
+                <p>Analyzing your prompt...</p>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Prompt Analyzer MVP • Optimize prompts for better AI outputs</p>
+            <p style="font-size: 12px; color: #999; margin-top: 8px;">
+                Currently using mock analysis. Add your Claude API key to enable real analysis.
+            </p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
