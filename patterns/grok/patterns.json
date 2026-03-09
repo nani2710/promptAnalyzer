@@ -1,0 +1,66 @@
+{
+  "model": "grok",
+  "displayName": "Grok (xAI)",
+  "strengths": [
+    "Real-time X (Twitter) data access",
+    "Direct, concise responses",
+    "Humor and wit capability",
+    "Current events awareness",
+    "Unfiltered analysis"
+  ],
+  "bestPractices": {
+    "realTime": {
+      "triggers": ["current", "latest", "recent", "today", "trend", "now", "right now", "X", "twitter"],
+      "tip": "Grok has real-time access to X (Twitter) - ask for current trends, live discussions, or recent events"
+    },
+    "directness": {
+      "triggers": ["briefly", "shortly", "quickly", "in short", "summarize", "tldr", "TL;DR"],
+      "tip": "Grok favors brevity - use TL;DR, In 3 bullet points, or Be direct for terse crisp answers"
+    },
+    "wit": {
+      "triggers": ["funny", "humorous", "sarcastic", "ironic", "witty", "joking"],
+      "tip": "Grok responds well to humor prompts - specify with wit, humorously, or in a Hitchhiker Guide style"
+    },
+    "roleAssignment": {
+      "triggers": ["you are", "act as", "persona", "play"],
+      "tip": "Assign Grok a persona - it embraces character-based framing effectively"
+    },
+    "unfiltered": {
+      "triggers": ["honest", "blunt", "no sugar coat", "frank"],
+      "tip": "Tell Grok to be completely honest or do not sugarcoat for direct unvarnished analysis"
+    }
+  },
+  "antiPatterns": [
+    {
+      "pattern": "please|could you|would you",
+      "issue": "Conversational filler",
+      "fix": "Grok is built for directness - skip the pleasantries"
+    },
+    {
+      "pattern": "good|nice|cool|interesting",
+      "issue": "Vague descriptors",
+      "fix": "Be explicit: concise, sharp, factual, no fluff"
+    },
+    {
+      "pattern": "^tell me|^give me",
+      "issue": "Weak instruction",
+      "fix": "Use direct verbs: Summarize, Analyze, List, Explain"
+    }
+  ],
+  "scoringWeights": {
+    "clarity": 1.3,
+    "specificity": 1.2,
+    "context": 0.9,
+    "constraints": 1.1,
+    "structure": 0.9,
+    "completeness": 0.9
+  },
+  "tips": [
+    "Grok has live X (Twitter) access - frame prompts around current events or trends",
+    "Use Be direct, no fluff for Grok's most natural response style",
+    "Grok handles humor - add with wit or humorously for engaging tone",
+    "For real-time data, specify the time frame: In the last 24 hours on X",
+    "Grok rewards bluntness - say Do not sugarcoat this analysis",
+    "Avoid over-structuring prompts - Grok thrives on direct conversational instructions"
+  ]
+}

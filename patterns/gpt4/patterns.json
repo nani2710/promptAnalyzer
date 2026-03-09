@@ -1,0 +1,243 @@
+{
+  "model": "GPT-4 (OpenAI)",
+  "version": "1.0",
+  "description": "Pattern matching rules optimized for GPT-4 models",
+  "sources": [
+    "https://platform.openai.com/docs/guides/prompt-engineering",
+    "https://arxiv.org/abs/2303.08774 (GPT-4 Technical Report)",
+    "https://arxiv.org/abs/2005.14165 (Few-Shot Learning paper)",
+    "OpenAI Cookbook examples"
+  ],
+  "strengths": [
+    "Few-shot learning excellence",
+    "Creative writing quality",
+    "Conversational responses",
+    "Token efficiency is critical",
+    "Function calling",
+    "Reasoning through complex tasks"
+  ],
+  "weaknesses": [
+    "Can be verbose/rambling without limits",
+    "Token costs matter",
+    "Needs explicit length constraints",
+    "Less ethical guardrails than Claude"
+  ],
+  "scoring_dimensions": {
+    "explicit_reasoning_steps": {
+      "weight": 0.25,
+      "description": "Clear step-by-step reasoning requests",
+      "patterns": [
+        {
+          "name": "few_shot_examples",
+          "regex": "(example|instance|for example|sample|e\\.g|like this|here's how)",
+          "points": 15,
+          "description": "Few-shot examples critical for GPT-4"
+        },
+        {
+          "name": "step_by_step",
+          "regex": "(step|reason|think|consider|evaluate|analyze)",
+          "points": 15,
+          "description": "Explicit step-by-step directive"
+        },
+        {
+          "name": "reasoning_time",
+          "regex": "(take time|think|reason|consider|carefully)",
+          "points": 10,
+          "description": "Give model time to think"
+        }
+      ]
+    },
+    "token_efficiency": {
+      "weight": 0.20,
+      "description": "Managing token usage and costs",
+      "patterns": [
+        {
+          "name": "word_limit_specified",
+          "regex": "(\\d+[\\s-]*(words?|tokens?|lines?|chars?))",
+          "points": 15,
+          "description": "GPT-4 rambles - word limits critical"
+        },
+        {
+          "name": "conciseness_directive",
+          "regex": "(concise|brief|short|terse|minimal|condensed)",
+          "points": 10,
+          "description": "Explicit conciseness request"
+        },
+        {
+          "name": "avoid_repetition",
+          "regex": "(avoid repeat|no redundan|don't repeat|be concise)",
+          "points": 8,
+          "description": "Prevention of verbose output"
+        }
+      ]
+    },
+    "context_window_usage": {
+      "weight": 0.15,
+      "description": "Optimal use of GPT-4's context window",
+      "patterns": [
+        {
+          "name": "context_provided",
+          "regex": "(context:|background:|given:|based on:|here is:)",
+          "points": 10,
+          "description": "Providing reference text and context"
+        },
+        {
+          "name": "reference_text",
+          "regex": "(below:|following:|passage:|document:|article:|text:)",
+          "points": 10,
+          "description": "Reference material provided"
+        }
+      ]
+    },
+    "structured_output": {
+      "weight": 0.20,
+      "description": "Clear output structure specification",
+      "patterns": [
+        {
+          "name": "format_specified",
+          "regex": "(JSON|XML|markdown|list|bullet|table|csv|format as)",
+          "points": 15,
+          "description": "Explicit output format"
+        },
+        {
+          "name": "structure_template",
+          "regex": "(structure:|fields:|key:|section:|component:|element:)",
+          "points": 10,
+          "description": "Template or structure provided"
+        },
+        {
+          "name": "output_constraints",
+          "regex": "(return.*as|output.*format|provide.*as)",
+          "points": 10,
+          "description": "Clear output expectations"
+        }
+      ]
+    },
+    "clarity_of_intent": {
+      "weight": 0.20,
+      "description": "Clear, unambiguous requests",
+      "patterns": [
+        {
+          "name": "goal_stated",
+          "regex": "(goal:|objective:|purpose:|aim:|target:|intent:)",
+          "points": 10,
+          "description": "Clear goal statement"
+        },
+        {
+          "name": "audience_specified",
+          "regex": "(audience:|for|users|readers|viewer|professional|beginner|expert)",
+          "points": 10,
+          "description": "Target audience specified"
+        },
+        {
+          "name": "success_criteria",
+          "regex": "(success:|criteria:|measure:|evaluate:|judge:|quality:)",
+          "points": 10,
+          "description": "How to judge success"
+        }
+      ]
+    }
+  },
+  "penalty_patterns": [
+    {
+      "name": "no_length_limit",
+      "regex": "^(?!.*\\d+\\s*(words|tokens|lines)).*write.*(?!.*limit)",
+      "points": -15,
+      "description": "GPT-4 without length limit produces verbose rambling"
+    },
+    {
+      "name": "no_format",
+      "regex": "^(?!.*(JSON|list|bullet|table|format)).*respond",
+      "points": -10,
+      "description": "Unstructured response without format spec"
+    },
+    {
+      "name": "no_examples",
+      "regex": "^(?!.*(example|instance|like|sample)).*(?:write|create|generate)",
+      "points": -8,
+      "description": "No examples provided for few-shot learning"
+    },
+    {
+      "name": "ambiguous_request",
+      "regex": "(tell me|give me|explain|describe)(?!.*specific)",
+      "points": -8,
+      "description": "Vague request without specificity"
+    }
+  ],
+  "bonus_patterns": [
+    {
+      "name": "function_calling",
+      "regex": "(function|call|execute|api|endpoint|tool)",
+      "points": 5,
+      "description": "Leveraging GPT-4 function calling capability"
+    },
+    {
+      "name": "json_request",
+      "regex": "(JSON|structured|parseable|machine readable)",
+      "points": 5,
+      "description": "JSON output is a GPT-4 strength"
+    }
+  ],
+  "interrogation_questions": [
+    {
+      "missing_element": "examples",
+      "question": "Can you show me 1-2 examples of the output you want?",
+      "alternative": "What does a good output look like?"
+    },
+    {
+      "missing_element": "length",
+      "question": "Should this be concise (100-200 words) or comprehensive (500+ words)?",
+      "alternative": "How long should the response be?"
+    },
+    {
+      "missing_element": "reasoning",
+      "question": "Do you want me to show my step-by-step reasoning?",
+      "alternative": "Should I explain how I arrived at this?"
+    },
+    {
+      "missing_element": "format",
+      "question": "Should I structure this as JSON, a list, a table, or paragraphs?",
+      "alternative": "What output format do you prefer?"
+    },
+    {
+      "missing_element": "audience",
+      "question": "Who is this for? (beginner, professional, technical, general audience?)",
+      "alternative": "What is the audience level?"
+    },
+    {
+      "missing_element": "goal",
+      "question": "What's the main goal or success criteria for this output?",
+      "alternative": "How will you judge if this is good?"
+    }
+  ],
+  "success_indicators": {
+    "has_examples": true,
+    "has_length_limit": true,
+    "has_reasoning_request": true,
+    "has_format_spec": true,
+    "has_audience_context": true,
+    "ideal_score": 85,
+    "minimum_acceptable": 60
+  },
+  "tips": [
+    "Few-shot learning is GPT-4's strength - provide examples",
+    "Always specify length limits - GPT-4 loves to ramble",
+    "Explicit format requests prevent ambiguous output",
+    "Token limits matter - be mindful of cost",
+    "Ask GPT-4 to think before responding for complex tasks",
+    "Structured requests (JSON, lists) work better than prose"
+  ],
+  "example_prompts": {
+    "poor": "Write a blog post about productivity",
+    "good": "Write a 500-word blog post about time management for busy professionals. Structure: Introduction (2 paragraphs), 3 Main Tips (each with explanation and example), Conclusion. Tone: Professional but engaging.",
+    "excellent": "You are a productivity blogger with expertise in executive time management.\n\nWrite a 500-word blog post for busy executives (C-suite level) about time management.\n\nStructure (word counts):\n- Compelling headline\n- Hook/intro: 50 words\n- 3 Key Tips: 120 words each\n  - Each tip: Explanation + Real example + Implementation step\n- Call-to-action: 50 words\n\nFormat: Markdown with subheadings\nTone: Professional, confident, practical\nAudience: C-suite executives with limited time\nAvoid: Cliches, generic advice, fluff\n\nReturn as markdown ready to publish."
+  },
+  "scoringWeights": {
+    "clarity": 1.1,
+    "specificity": 1.2,
+    "context": 1.1,
+    "constraints": 1.0,
+    "structure": 1.2,
+    "completeness": 1.0
+  }
+}

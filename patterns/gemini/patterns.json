@@ -1,0 +1,66 @@
+{
+  "model": "gemini",
+  "displayName": "Gemini (Google)",
+  "strengths": [
+    "Multimodal understanding (text, image, audio, video)",
+    "Google Search grounding",
+    "Structured output (JSON schema)",
+    "Code execution",
+    "Long context (1M tokens in Gemini 1.5)"
+  ],
+  "bestPractices": {
+    "multimodal": {
+      "triggers": ["image", "photo", "picture", "video", "audio", "describe", "analyze this"],
+      "tip": "Gemini is natively multimodal — reference images/videos in your prompt alongside text for richer analysis"
+    },
+    "grounding": {
+      "triggers": ["search", "current", "latest", "recent", "today", "news", "fact", "real-time"],
+      "tip": "Enable Google Search grounding to give Gemini access to current, factual information"
+    },
+    "structuredOutput": {
+      "triggers": ["JSON", "schema", "structured", "format as", "return as", "object"],
+      "tip": "Gemini supports JSON schema output — specify the exact schema you want for reliable structured responses"
+    },
+    "codeExecution": {
+      "triggers": ["run", "execute", "calculate", "compute", "script", "code", "function"],
+      "tip": "Gemini can execute code internally — ask it to 'run this and show the output' for verified results"
+    },
+    "roleInit": {
+      "triggers": ["you are", "act as", "play the role", "as an expert"],
+      "tip": "Set a clear role for Gemini: 'You are a Google Cloud architect with expertise in Kubernetes'"
+    }
+  },
+  "antiPatterns": [
+    {
+      "pattern": "good|nice|cool|interesting",
+      "issue": "Vague descriptors",
+      "fix": "Replace with precise adjectives: 'technically accurate', 'beginner-friendly', 'production-ready'"
+    },
+    {
+      "pattern": "^tell me|^give me",
+      "issue": "Indirect opener",
+      "fix": "Use direct imperatives: 'Explain', 'Analyze', 'Generate', 'Summarize'"
+    },
+    {
+      "pattern": "please|could you",
+      "issue": "Conversational filler",
+      "fix": "Remove politeness filler for cleaner, more direct instruction"
+    }
+  ],
+  "scoringWeights": {
+    "clarity": 1.0,
+    "specificity": 1.1,
+    "context": 1.2,
+    "constraints": 1.0,
+    "structure": 1.0,
+    "completeness": 1.1
+  },
+  "tips": [
+    "Gemini supports 1M token context (Gemini 1.5) — paste entire codebases or documents",
+    "Use Google Search grounding for real-time factual accuracy",
+    "Specify a JSON schema for reliable structured data output",
+    "Gemini can run and verify code internally — ask for 'executable results'",
+    "For multimodal tasks, describe both the image AND your question clearly",
+    "Use 'safety_settings' awareness: avoid sensationalist language that may trigger filters"
+  ]
+}

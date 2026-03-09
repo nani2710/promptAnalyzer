@@ -1,0 +1,269 @@
+{
+  "model": "Claude (Anthropic)",
+  "version": "1.0",
+  "description": "Pattern matching rules optimized for Claude models",
+  "last_updated": "2025-03-09",
+  "sources": [
+    "https://docs.anthropic.com/claude/",
+    "https://arxiv.org/abs/2212.08073 (Constitutional AI paper)",
+    "DAIR-AI Prompt Engineering Guide",
+    "Community feedback from Claude users"
+  ],
+  "strengths": [
+    "Long context reasoning (200K tokens)",
+    "Constitutional AI training (ethics-aware)",
+    "Nuanced understanding of complex concepts",
+    "Step-by-step reasoning with explanations",
+    "Vision capabilities (image analysis)",
+    "Tool use and function calling"
+  ],
+  "weaknesses": [
+    "Knowledge cutoff (Jan 2025)",
+    "No real-time web search by default",
+    "No image generation",
+    "Slower than some alternatives"
+  ],
+  "scoring_dimensions": {
+    "system_level_structuring": {
+      "weight": 0.25,
+      "description": "Clear role, context, and execution environment",
+      "patterns": [
+        {
+          "name": "role_assignment",
+          "regex": "^(you are|act as|assume you|take on the role of|imagine you are)",
+          "points": 15,
+          "description": "Claude responds better with explicit role"
+        },
+        {
+          "name": "technical_context",
+          "regex": "(using|with|in|framework|library|language|stack|environment|system)",
+          "points": 10,
+          "description": "Specify tech stack or environment"
+        },
+        {
+          "name": "execution_constraints",
+          "regex": "(constraint|limit|boundary|rule|guideline|must|should|cannot)",
+          "points": 10,
+          "description": "Explicit system-level constraints"
+        }
+      ]
+    },
+    "format_blueprints": {
+      "weight": 0.20,
+      "description": "Concrete examples of expected output format",
+      "patterns": [
+        {
+          "name": "example_provided",
+          "regex": "(example:|for example:|like this:|sample:|template:)",
+          "points": 15,
+          "description": "Providing examples guides output structure"
+        },
+        {
+          "name": "format_spec",
+          "regex": "(JSON|XML|markdown|bullet|numbered list|table|format as)",
+          "points": 10,
+          "description": "Explicit format specification"
+        },
+        {
+          "name": "structure_detail",
+          "regex": "(structure:|fields:|components:|sections:|parts:)",
+          "points": 10,
+          "description": "Detail about expected structure"
+        }
+      ]
+    },
+    "chain_of_thought": {
+      "weight": 0.20,
+      "description": "Explicit request for reasoning process",
+      "patterns": [
+        {
+          "name": "step_by_step",
+          "regex": "(step.by.step|step by step|think step|reason|reasoning|why|how|analyze)",
+          "points": 15,
+          "description": "Claude excels at multi-step reasoning"
+        },
+        {
+          "name": "before_generating",
+          "regex": "(before.*respond|first.*then|outline.*before|think.*then)",
+          "points": 10,
+          "description": "Instruction to reason before output"
+        },
+        {
+          "name": "explain_approach",
+          "regex": "(explain.*approach|show.*work|map.*logic|trace|walkthrough)",
+          "points": 10,
+          "description": "Request to show reasoning"
+        }
+      ]
+    },
+    "constraint_clarity": {
+      "weight": 0.15,
+      "description": "Clear boundaries and what to avoid",
+      "patterns": [
+        {
+          "name": "word_limit",
+          "regex": "(\\d+\\s*(words|lines|sentences|characters|tokens))",
+          "points": 10,
+          "description": "Explicit length constraint"
+        },
+        {
+          "name": "avoid_list",
+          "regex": "(avoid|do not|don't|don't include|exclude|not|without)",
+          "points": 10,
+          "description": "Explicit things to avoid"
+        },
+        {
+          "name": "tone_spec",
+          "regex": "(tone:|style:|voice:|manner:|professional|casual|formal|simple|technical)",
+          "points": 5,
+          "description": "Tone or style specification"
+        }
+      ]
+    },
+    "multimodal_grounding": {
+      "weight": 0.10,
+      "description": "Using Claude's vision capabilities",
+      "patterns": [
+        {
+          "name": "image_reference",
+          "regex": "(image|screenshot|diagram|wireframe|photo|visual|picture|attached|see)",
+          "points": 15,
+          "description": "Leveraging Claude's vision capability"
+        },
+        {
+          "name": "visual_analysis",
+          "regex": "(analyze.*image|describe.*visual|read|identify|extract|understand visual)",
+          "points": 10,
+          "description": "Explicit image analysis request"
+        }
+      ]
+    },
+    "directiveness": {
+      "weight": 0.10,
+      "description": "Removing conversational filler for precision",
+      "patterns": [
+        {
+          "name": "direct_command",
+          "regex": "^(write|create|build|explain|analyze|generate|produce|make|draft)",
+          "points": 10,
+          "description": "Imperative verb at start"
+        },
+        {
+          "name": "remove_filler",
+          "regex": "(?!.*(please|could you|would you|thank you|if possible|kindly))",
+          "points": 8,
+          "description": "No conversational filler"
+        }
+      ]
+    }
+  },
+  "penalty_patterns": [
+    {
+      "name": "conversational_filler",
+      "regex": "(please|could you|would you|thank you in advance|kindly|if possible)",
+      "points": -5,
+      "description": "Remove politeness filler - Claude prefers directness"
+    },
+    {
+      "name": "knowledge_cutoff_bypass",
+      "regex": "(latest|recent|current|today|right now|2024|2025|breaking)",
+      "points": -8,
+      "description": "For current info, explicitly enable web search"
+    },
+    {
+      "name": "image_generation_request",
+      "regex": "(generate|create|draw|make.*image|picture|visual art|illustration)",
+      "points": -15,
+      "description": "Claude cannot generate images - describe instead"
+    },
+    {
+      "name": "over_engineering",
+      "regex": "(1000.*example|50.*page|extremely detailed|comprehensive.*analysis|all.*possible)",
+      "points": -10,
+      "description": "Claude prefers focused, not exhaustive responses"
+    }
+  ],
+  "bonus_patterns": [
+    {
+      "name": "ethical_consideration",
+      "regex": "(ethical|bias|fairness|safety|value|principle|consideration|impact)",
+      "points": 5,
+      "description": "Claude trained with constitutional AI"
+    },
+    {
+      "name": "long_context_utilization",
+      "regex": "(long|detailed|comprehensive|full context|background|history|detailed background)",
+      "points": 5,
+      "description": "Claude can handle long context well"
+    },
+    {
+      "name": "tool_use_request",
+      "regex": "(use tool|function call|execute|call|api|endpoint|integration)",
+      "points": 5,
+      "description": "Claude supports tool use"
+    }
+  ],
+  "interrogation_questions": [
+    {
+      "missing_element": "role_assignment",
+      "question": "What's your professional background or expertise level for this task?",
+      "alternative": "What role should I take? (e.g., Senior Engineer, Product Manager, Analyst)"
+    },
+    {
+      "missing_element": "context",
+      "question": "What's your tech stack, use case, or operating environment?",
+      "alternative": "What context should I consider for this problem?"
+    },
+    {
+      "missing_element": "chain_of_thought",
+      "question": "Should I explain my reasoning before giving the final answer?",
+      "alternative": "Would you like me to think step-by-step first?"
+    },
+    {
+      "missing_element": "constraints",
+      "question": "Are there any constraints I should respect? (length, style, scope, taboos)",
+      "alternative": "What should I avoid or not include?"
+    },
+    {
+      "missing_element": "format",
+      "question": "How should I structure the response? (format, sections, output type)",
+      "alternative": "Can you show an example of the output structure you want?"
+    },
+    {
+      "missing_element": "vision",
+      "question": "Do you have a wireframe, diagram, or screenshot that would help clarify this?",
+      "alternative": "Would a visual reference improve accuracy?"
+    }
+  ],
+  "success_indicators": {
+    "has_role": true,
+    "has_context": true,
+    "has_reasoning_directive": true,
+    "has_constraints": true,
+    "has_format_spec": true,
+    "has_examples": true,
+    "ideal_score": 90,
+    "minimum_acceptable": 65
+  },
+  "tips": [
+    "Claude excels at long-form reasoning - provide detailed context",
+    "Constitutional AI training means Claude considers ethics - leverage this",
+    "Step-by-step thinking improves accuracy significantly",
+    "Explicit constraints are respected - use them liberally",
+    "Claude can analyze images - attach wireframes or screenshots",
+    "For current information, explicitly ask to search or mention cutoff"
+  ],
+  "example_prompts": {
+    "poor": "Tell me about AI",
+    "good": "You are an AI expert. Explain artificial intelligence to a 15-year-old, using simple examples. Keep it under 200 words. Format: Definition, Key concepts, Real-world impact.",
+    "excellent": "You are a senior computer science teacher with 10 years experience teaching teenagers.\n\nExplain artificial intelligence to a bright 15-year-old student who knows basic math.\n\nStructure:\n1. Definition (1-2 sentences)\n2. How it works (2-3 sentences with analogy)\n3. Real-world examples (3-4 specific examples)\n4. Why it matters (1-2 sentences)\n\nTone: Friendly, encouraging, avoids jargon\nLength: 150-200 words\nFormat: Numbered sections\nAvoid: Technical terms without explanation, boring examples"
+  },
+  "scoringWeights": {
+    "clarity": 1.2,
+    "specificity": 1.1,
+    "context": 1.0,
+    "constraints": 0.9,
+    "structure": 1.1,
+    "completeness": 1.0
+  }
+}

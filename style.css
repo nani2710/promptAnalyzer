@@ -174,13 +174,29 @@ body {
     border-radius: 12px;
     margin-bottom: 30px;
     text-align: center;
+    transition: background 0.5s ease;
+}
+
+/* Score Quality States — applied dynamically via JS */
+.score-card.score-excellent {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+}
+.score-card.score-good {
+    background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
+}
+.score-card.score-average {
+    background: linear-gradient(135deg, #f7971e 0%, #ffd200 100%);
+    color: #333;
+}
+.score-card.score-poor {
+    background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
 }
 
 .score-display {
     display: flex;
     align-items: baseline;
     justify-content: center;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 
 .score-number {
@@ -194,6 +210,23 @@ body {
     opacity: 0.9;
 }
 
+/* Score quality badge shown below the number */
+.score-badge {
+    display: inline-block;
+    padding: 4px 18px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: rgba(255,255,255,0.25);
+    margin-bottom: 16px;
+}
+.score-card.score-average .score-badge {
+    background: rgba(0,0,0,0.12);
+    color: #333;
+}
+
 .score-bar {
     background: rgba(255, 255, 255, 0.2);
     height: 8px;
@@ -204,7 +237,7 @@ body {
 .score-fill {
     background: white;
     height: 100%;
-    transition: width 0.5s ease;
+    transition: width 0.6s ease;
     border-radius: 4px;
 }
 
@@ -244,9 +277,16 @@ body {
     background: #f9f9f9;
     padding: 20px;
     border-radius: 8px;
-    border: 1px solid #e0e0e0;
+    border: 2px solid #e0e0e0;
     text-align: center;
+    transition: border-color 0.4s ease;
 }
+
+/* Metric card quality borders */
+.metric-card.metric-excellent { border-color: #38ef7d; }
+.metric-card.metric-good      { border-color: #56ab2f; }
+.metric-card.metric-average   { border-color: #ffd200; }
+.metric-card.metric-poor      { border-color: #e74c3c; }
 
 .metric-label {
     font-weight: 600;
@@ -260,34 +300,57 @@ body {
     font-weight: 700;
     color: #667eea;
     margin-bottom: 10px;
+    transition: color 0.4s ease;
 }
+
+/* Metric score color by quality */
+.metric-card.metric-excellent .metric-score { color: #11998e; }
+.metric-card.metric-good      .metric-score { color: #56ab2f; }
+.metric-card.metric-average   .metric-score { color: #e67e22; }
+.metric-card.metric-poor      .metric-score { color: #e74c3c; }
 
 .metric-bar {
     background: #e0e0e0;
-    height: 6px;
-    border-radius: 3px;
+    height: 8px;
+    border-radius: 4px;
     overflow: hidden;
 }
 
 .metric-fill {
     background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
     height: 100%;
-    transition: width 0.5s ease;
+    transition: width 0.6s ease, background 0.4s ease;
+    border-radius: 4px;
 }
+
+/* Metric bar colors */
+.metric-card.metric-excellent .metric-fill { background: linear-gradient(90deg,#11998e,#38ef7d); }
+.metric-card.metric-good      .metric-fill { background: linear-gradient(90deg,#56ab2f,#a8e063); }
+.metric-card.metric-average   .metric-fill { background: linear-gradient(90deg,#f7971e,#ffd200); }
+.metric-card.metric-poor      .metric-fill { background: linear-gradient(90deg,#c0392b,#e74c3c); }
 
 /* Issues Box */
 .issues-box {
-    background: #fff3cd;
+    background: #fff5f5;
     padding: 20px;
     border-radius: 8px;
     margin-bottom: 30px;
-    border-left: 4px solid #ffc107;
+    border-left: 4px solid #e74c3c;
 }
 
 .issues-box h3 {
-    color: #856404;
+    color: #c0392b;
     margin-bottom: 15px;
     font-size: 1.1rem;
+}
+
+/* When no issues — green state */
+.issues-box.no-issues {
+    background: #f0fff4;
+    border-left-color: #38ef7d;
+}
+.issues-box.no-issues h3 {
+    color: #11998e;
 }
 
 .issues-list {
@@ -295,18 +358,34 @@ body {
 }
 
 .issue-item {
-    padding: 10px 0;
-    color: #856404;
-    border-bottom: 1px solid rgba(255, 193, 7, 0.3);
-    font-size: 0.95rem;
+    padding: 10px 12px;
+    color: #c0392b;
+    background: rgba(231, 76, 60, 0.06);
+    border-radius: 6px;
+    margin-bottom: 6px;
+    font-size: 0.92rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
 }
 
-.issue-item:last-child {
-    border-bottom: none;
+.issue-item .issue-icon {
+    font-size: 1rem;
+    flex-shrink: 0;
+    margin-top: 1px;
 }
 
 .issue-item strong {
-    color: #ff6b6b;
+    color: #c0392b;
+    font-weight: 700;
+}
+
+.issue-item.issue-ok {
+    color: #11998e;
+    background: rgba(56, 239, 125, 0.1);
+}
+.issue-item.issue-ok strong {
+    color: #11998e;
 }
 
 /* Suggestions Box */
