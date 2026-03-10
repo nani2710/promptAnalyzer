@@ -2,12 +2,12 @@ const path = require('path');
 const patterns = require(path.join(__dirname, '../patterns/gpt4/patterns.json'));
 
 class GPT4Analyzer {
-    analyzePrompt(prompt, category) {
-        const metrics = this.calculateMetrics(prompt);
+    analyzePrompt(prompt, category, role) {
+        const metrics = this.calculateMetrics(prompt, category, role);
         const issues = this.detectIssues(prompt);
         const score = this.calculateOverallScore(metrics, prompt);
         const suggestion = this.generateSuggestion(prompt, issues);
-        const claudeTips = this.getModelTips(prompt); // key stays claudeTips for frontend compat
+        const claudeTips = this.getModelTips(prompt);
         const improvedPrompt = this.improvePrompt(prompt, issues);
 
         return {
@@ -18,8 +18,18 @@ class GPT4Analyzer {
             claudeTips,
             improvedPrompt,
             category: category === 'auto' ? this.detectCategory(prompt) : category,
-            model: 'gpt4'
+            model: 'gpt4',
+            role: role || 'general'
         };
+    }
+
+    // ─── Merge base weights with category then role overrides ─────────────────
+
+    getEffectiveWeights(category, role) {
+        const base    = { ...patterns.scoringWeights };
+        const catOvr  = patterns.category_weight_overrides?.[category] || {};
+        const roleOvr = patterns.role_weight_overrides?.[role] || {};
+        return { ...base, ...catOvr, ...roleOvr };
     }
 
     // ─── Normalize each dimension's earned points to 0-100 ────────────────────
@@ -58,9 +68,9 @@ class GPT4Analyzer {
 
     // ─── Map scoring_dimensions to the 6 frontend metric slots ────────────────
 
-    calculateMetrics(prompt) {
+    calculateMetrics(prompt, category, role) {
         const dims = patterns.scoring_dimensions;
-        const w = patterns.scoringWeights;
+        const w = this.getEffectiveWeights(category, role);
 
         const reasoning  = this.scoreDimension(prompt, dims.explicit_reasoning_steps);
         const tokens     = this.scoreDimension(prompt, dims.token_efficiency);

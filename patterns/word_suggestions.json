@@ -1,0 +1,82 @@
+{
+  "vague_word_replacements": {
+    "good": ["accurate", "production-ready", "comprehensive", "well-structured", "reliable"],
+    "nice": ["clear", "precise", "professional", "elegant", "polished"],
+    "cool": ["innovative", "modern", "efficient", "impressive", "cutting-edge"],
+    "interesting": ["insightful", "in-depth", "detailed", "data-driven", "nuanced"],
+    "big": ["large-scale", "enterprise-grade", "high-volume", "extensive", "comprehensive"],
+    "small": ["concise", "minimal", "lightweight", "compact", "targeted"],
+    "simple": ["straightforward", "beginner-friendly", "easy-to-follow", "step-by-step", "clear"],
+    "useful": ["actionable", "practical", "implementable", "effective", "value-adding"],
+    "bad": ["inefficient", "error-prone", "poorly-structured", "anti-pattern", "problematic"],
+    "complex": ["multi-layered", "sophisticated", "technically detailed", "advanced", "nuanced"],
+    "fast": ["low-latency", "optimized", "high-performance", "sub-100ms", "efficient"],
+    "smart": ["intelligent", "context-aware", "adaptive", "reasoning-based", "strategic"],
+    "stuff": ["components", "elements", "features", "aspects", "details"],
+    "thing": ["concept", "element", "feature", "component", "mechanism"],
+    "really": ["significantly", "critically", "specifically", "precisely", "notably"],
+    "very": ["highly", "extremely", "notably", "particularly", "especially"]
+  },
+  "weak_openers": {
+    "tell me about": ["Explain", "Analyze", "Summarize", "Describe in detail", "Break down"],
+    "give me": ["Provide", "Generate", "List", "Create", "Return"],
+    "can you": ["Analyze", "Write", "Create", "Generate", "Explain"],
+    "could you": ["Explain", "Build", "Design", "Produce", "Draft"],
+    "i want": ["Generate", "Create", "Explain", "Analyze", "Summarize"],
+    "i need": ["Provide", "Build", "Design", "Produce", "Return"],
+    "write about": ["Write a detailed analysis of", "Compose a structured overview of", "Draft a comprehensive guide on"],
+    "explain to me": ["Explain step-by-step", "Break down", "Illustrate with examples", "Walk me through"]
+  },
+  "missing_element_phrases": {
+    "role": [
+      "You are a senior software engineer with 10 years experience.",
+      "You are a domain expert specializing in {topic}.",
+      "You are a data scientist with expertise in machine learning.",
+      "You are a technical writer creating developer documentation.",
+      "You are a product manager with startup experience.",
+      "Act as a research analyst with academic expertise."
+    ],
+    "audience": [
+      "Target audience: Beginners with no prior knowledge.",
+      "Audience: Intermediate developers familiar with the basics.",
+      "For: Senior engineers and technical decision-makers.",
+      "Intended for: University students studying computer science.",
+      "Readers: Non-technical business stakeholders."
+    ],
+    "format": [
+      "Format: Numbered list with clear explanations.",
+      "Format: JSON with keys: summary, steps, examples.",
+      "Format: Markdown with headers and code blocks.",
+      "Format: Concise bullet points (3-5 per section).",
+      "Format: Table with columns: Feature | Pros | Cons.",
+      "Return as structured markdown ready to publish."
+    ],
+    "length": [
+      "Length: Under 100 words.",
+      "Length: 150-250 words maximum.",
+      "Length: 300-500 words, comprehensive.",
+      "Keep it concise — no filler, under 200 words.",
+      "Limit: 3 bullet points per section."
+    ],
+    "constraints": [
+      "Avoid: Jargon without explanation.",
+      "Do not use: Clichés, vague generalities, filler.",
+      "Constraints: Production-ready code only, no pseudocode.",
+      "Avoid: Overly academic language.",
+      "Do not repeat ideas across sections."
+    ],
+    "step_by_step": [
+      "Think step-by-step before responding.",
+      "Reason through this carefully before giving your answer.",
+      "First outline your approach, then execute it.",
+      "Show your reasoning, then provide the final answer."
+    ]
+  },
+  "power_words": {
+    "analysis": ["analyze", "evaluate", "assess", "examine", "investigate"],
+    "creation": ["generate", "produce", "draft", "design", "architect"],
+    "explanation": ["explain", "clarify", "illustrate", "demonstrate", "break down"],
+    "comparison": ["compare", "contrast", "differentiate", "evaluate trade-offs", "rank"],
+    "summary": ["summarize", "condense", "distill", "highlight key points", "abstract"]
+  }
+}

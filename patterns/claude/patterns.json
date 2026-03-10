@@ -50,71 +50,71 @@
     },
     "format_blueprints": {
       "weight": 0.20,
-      "description": "Concrete examples of expected output format",
+      "description": "Concrete specification of expected output format",
       "patterns": [
         {
           "name": "example_provided",
-          "regex": "(example:|for example:|like this:|sample:|template:)",
+          "regex": "(example:|for example:|like this:|sample:|template:|e.g.|such as:)",
           "points": 15,
           "description": "Providing examples guides output structure"
         },
         {
           "name": "format_spec",
-          "regex": "(JSON|XML|markdown|bullet|numbered list|table|format as)",
+          "regex": "(JSON|XML|markdown|bullet|numbered list|table|format:|format as|return as|output:|schema:)",
           "points": 10,
           "description": "Explicit format specification"
         },
         {
           "name": "structure_detail",
-          "regex": "(structure:|fields:|components:|sections:|parts:)",
+          "regex": "(structure:|fields:|components:|sections:|parts:|1\\.|2\\.|3\\.|^-\\s)",
           "points": 10,
-          "description": "Detail about expected structure"
+          "description": "Detail about expected structure via labels or numbered lists"
         }
       ]
     },
     "chain_of_thought": {
       "weight": 0.20,
-      "description": "Explicit request for reasoning process",
+      "description": "Explicit request for reasoning or multi-step analysis",
       "patterns": [
         {
           "name": "step_by_step",
-          "regex": "(step.by.step|step by step|think step|reason|reasoning|why|how|analyze)",
+          "regex": "(step.by.step|step by step|think step|reason|reasoning|analyze|analyse|conduct|cover:|scope:|break.?down|break it down|examine|evaluate|assess)",
           "points": 15,
-          "description": "Claude excels at multi-step reasoning"
+          "description": "Claude excels at multi-step reasoning and structured analysis"
         },
         {
           "name": "before_generating",
           "regex": "(before.*respond|first.*then|outline.*before|think.*then)",
           "points": 10,
-          "description": "Instruction to reason before output"
+          "description": "Instruction to reason or outline before responding"
         },
         {
           "name": "explain_approach",
-          "regex": "(explain.*approach|show.*work|map.*logic|trace|walkthrough)",
+          "regex": "(explain.*approach|show.*work|map.*logic|trace|walkthrough|methodology|findings|key finding|highlight|cover|focus on)",
           "points": 10,
-          "description": "Request to show reasoning"
+          "description": "Request to explain approach or cover specific analytic areas"
         }
       ]
     },
     "constraint_clarity": {
       "weight": 0.15,
-      "description": "Clear boundaries and what to avoid",
+      "description": "Clear boundaries — what to include, exclude, and how long",
       "patterns": [
         {
           "name": "word_limit",
-          "regex": "(\\d+\\s*(words|lines|sentences|characters|tokens))",
+          "regex": "(\\d+[-\\s]*(words|lines|sentences|characters|tokens)|length:|under \\d+|max\\w* \\d+|\\d+ words|\\d+-\\d+ words)",
           "points": 10,
           "description": "Explicit length constraint"
         },
         {
           "name": "avoid_list",
-          "regex": "(avoid|do not|don't|don't include|exclude|not|without)",
+          "regex": "(avoid:|do not:|don't include|exclude|without jargon|no pseudocode|no platitudes|no filler|not more than|constraints:)",
           "points": 10,
-          "description": "Explicit things to avoid"
+          "description": "Explicit things to avoid or constraint block label"
         },
         {
           "name": "tone_spec",
-          "regex": "(tone:|style:|voice:|manner:|professional|casual|formal|simple|technical)",
+          "regex": "(tone:|style:|voice:|manner:|professional|casual|formal|simple|technical|scholarly|rigorous|direct|concise|evidence.based)",
           "points": 5,
           "description": "Tone or style specification"
         }
@@ -122,17 +122,17 @@
     },
     "multimodal_grounding": {
       "weight": 0.10,
-      "description": "Using Claude's vision capabilities",
+      "description": "Using Claude's vision capabilities or rich document grounding",
       "patterns": [
         {
           "name": "image_reference",
-          "regex": "(image|screenshot|diagram|wireframe|photo|visual|picture|attached|see)",
+          "regex": "(attached image|this image|this screenshot|this diagram|this wireframe|this photo|this picture|see the image|the image shows|the photo)",
           "points": 15,
-          "description": "Leveraging Claude's vision capability"
+          "description": "Explicitly referencing an attached image or visual"
         },
         {
           "name": "visual_analysis",
-          "regex": "(analyze.*image|describe.*visual|read|identify|extract|understand visual)",
+          "regex": "(analyze.*image|describe.*image|read.*diagram|identify.*image|extract.*image|what is in this image|caption this)",
           "points": 10,
           "description": "Explicit image analysis request"
         }
@@ -265,5 +265,21 @@
     "constraints": 0.9,
     "structure": 1.1,
     "completeness": 1.0
+  },
+  "category_weight_overrides": {
+    "research":       { "specificity": 1.5, "context": 1.4, "constraints": 0.4, "structure": 0.7 },
+    "technical":      { "structure": 1.5, "constraints": 1.4, "specificity": 1.3, "completeness": 1.2 },
+    "creative":       { "clarity": 1.5, "specificity": 0.7, "constraints": 0.3, "structure": 0.6 },
+    "educational":    { "context": 1.5, "clarity": 1.4, "completeness": 1.3, "constraints": 0.5 },
+    "conversational": { "clarity": 1.4, "context": 1.4, "constraints": 0.3, "structure": 0.5 },
+    "productivity":   { "structure": 1.3, "constraints": 1.2, "completeness": 1.2 },
+    "fun":            { "clarity": 1.5, "constraints": 0.2, "structure": 0.4, "specificity": 0.7 }
+  },
+  "role_weight_overrides": {
+    "learner":     { "clarity": 1.5, "context": 1.3, "constraints": 0.4, "structure": 0.6, "specificity": 0.8 },
+    "researcher":  { "specificity": 1.5, "context": 1.5, "completeness": 1.3, "constraints": 0.4, "structure": 0.7 },
+    "builder":     { "structure": 1.5, "constraints": 1.5, "specificity": 1.4, "completeness": 1.3, "clarity": 1.2 },
+    "creator":     { "clarity": 1.5, "context": 1.3, "constraints": 0.3, "structure": 0.5, "specificity": 0.7 },
+    "analyst":     { "structure": 1.4, "specificity": 1.4, "completeness": 1.3, "context": 1.2, "constraints": 1.1 }
   }
 }

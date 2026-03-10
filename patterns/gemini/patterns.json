@@ -11,7 +11,7 @@
   "bestPractices": {
     "multimodal": {
       "triggers": ["image", "photo", "picture", "video", "audio", "describe", "analyze this"],
-      "tip": "Gemini is natively multimodal — reference images/videos in your prompt alongside text for richer analysis"
+      "tip": "Gemini is natively multimodal - reference images/videos in your prompt alongside text for richer analysis"
     },
     "grounding": {
       "triggers": ["search", "current", "latest", "recent", "today", "news", "fact", "real-time"],
@@ -19,27 +19,27 @@
     },
     "structuredOutput": {
       "triggers": ["JSON", "schema", "structured", "format as", "return as", "object"],
-      "tip": "Gemini supports JSON schema output — specify the exact schema you want for reliable structured responses"
+      "tip": "Gemini supports JSON schema output - specify the exact schema you want for reliable structured responses"
     },
     "codeExecution": {
       "triggers": ["run", "execute", "calculate", "compute", "script", "code", "function"],
-      "tip": "Gemini can execute code internally — ask it to 'run this and show the output' for verified results"
+      "tip": "Gemini can execute code internally - ask it to run this and show the output for verified results"
     },
     "roleInit": {
       "triggers": ["you are", "act as", "play the role", "as an expert"],
-      "tip": "Set a clear role for Gemini: 'You are a Google Cloud architect with expertise in Kubernetes'"
+      "tip": "Set a clear role for Gemini: You are a Google Cloud architect with expertise in Kubernetes"
     }
   },
   "antiPatterns": [
     {
       "pattern": "good|nice|cool|interesting",
       "issue": "Vague descriptors",
-      "fix": "Replace with precise adjectives: 'technically accurate', 'beginner-friendly', 'production-ready'"
+      "fix": "Replace with precise adjectives: technically accurate, beginner-friendly, production-ready"
     },
     {
       "pattern": "^tell me|^give me",
       "issue": "Indirect opener",
-      "fix": "Use direct imperatives: 'Explain', 'Analyze', 'Generate', 'Summarize'"
+      "fix": "Use direct imperatives: Explain, Analyze, Generate, Summarize"
     },
     {
       "pattern": "please|could you",
@@ -55,12 +55,28 @@
     "structure": 1.0,
     "completeness": 1.1
   },
+  "category_weight_overrides": {
+    "research":       { "specificity": 1.5, "context": 1.5, "constraints": 0.4, "structure": 0.7 },
+    "technical":      { "structure": 1.4, "constraints": 1.3, "specificity": 1.3, "completeness": 1.2 },
+    "creative":       { "clarity": 1.5, "context": 1.4, "constraints": 0.3, "structure": 0.5 },
+    "educational":    { "context": 1.5, "clarity": 1.4, "completeness": 1.3, "constraints": 0.5 },
+    "conversational": { "clarity": 1.4, "context": 1.4, "constraints": 0.3, "structure": 0.4 },
+    "productivity":   { "structure": 1.3, "constraints": 1.2, "completeness": 1.2 },
+    "fun":            { "clarity": 1.5, "constraints": 0.2, "structure": 0.4, "specificity": 0.6 }
+  },
+  "role_weight_overrides": {
+    "learner":     { "clarity": 1.5, "context": 1.4, "constraints": 0.4, "structure": 0.5, "specificity": 0.8 },
+    "researcher":  { "specificity": 1.5, "context": 1.5, "completeness": 1.3, "constraints": 0.4, "structure": 0.6 },
+    "builder":     { "structure": 1.5, "constraints": 1.4, "specificity": 1.4, "completeness": 1.3, "clarity": 1.2 },
+    "creator":     { "clarity": 1.5, "context": 1.4, "constraints": 0.3, "structure": 0.4, "specificity": 0.7 },
+    "analyst":     { "structure": 1.4, "specificity": 1.4, "completeness": 1.3, "context": 1.3, "constraints": 1.0 }
+  },
   "tips": [
-    "Gemini supports 1M token context (Gemini 1.5) — paste entire codebases or documents",
+    "Gemini supports 1M token context (Gemini 1.5) - paste entire codebases or documents",
     "Use Google Search grounding for real-time factual accuracy",
     "Specify a JSON schema for reliable structured data output",
-    "Gemini can run and verify code internally — ask for 'executable results'",
+    "Gemini can run and verify code internally - ask for executable results",
     "For multimodal tasks, describe both the image AND your question clearly",
-    "Use 'safety_settings' awareness: avoid sensationalist language that may trigger filters"
+    "Use safety_settings awareness: avoid sensationalist language that may trigger filters"
   ]
 }

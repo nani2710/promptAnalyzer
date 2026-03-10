@@ -2,12 +2,12 @@ const path = require('path');
 const patterns = require(path.join(__dirname, '../patterns/gemini/patterns.json'));
 
 class GeminiAnalyzer {
-    analyzePrompt(prompt, category) {
-        const metrics = this.calculateMetrics(prompt);
+    analyzePrompt(prompt, category, role) {
+        const metrics = this.calculateMetrics(prompt, category, role);
         const issues = this.detectIssues(prompt);
         const score = this.calculateOverallScore(metrics);
         const suggestion = this.generateSuggestion(prompt, issues);
-        const claudeTips = this.getModelTips(prompt); // key stays claudeTips for frontend compat
+        const claudeTips = this.getModelTips(prompt);
         const improvedPrompt = this.improvePrompt(prompt, issues);
 
         return {
@@ -18,14 +18,22 @@ class GeminiAnalyzer {
             claudeTips,
             improvedPrompt,
             category: category === 'auto' ? this.detectCategory(prompt) : category,
-            model: 'gemini'
+            model: 'gemini',
+            role: role || 'general'
         };
     }
 
-    calculateMetrics(prompt) {
+    getEffectiveWeights(category, role) {
+        const base    = { ...patterns.scoringWeights };
+        const catOvr  = patterns.category_weight_overrides?.[category] || {};
+        const roleOvr = patterns.role_weight_overrides?.[role] || {};
+        return { ...base, ...catOvr, ...roleOvr };
+    }
+
+    calculateMetrics(prompt, category, role) {
         const words = prompt.split(/\s+/).filter(w => w.length > 0);
         const sentences = prompt.split(/[.!?]+/).filter(s => s.trim().length > 0);
-        const w = patterns.scoringWeights;
+        const w = this.getEffectiveWeights(category, role);
 
         return {
             clarity:      Math.min(100, this.calcClarity(prompt, words) * w.clarity),

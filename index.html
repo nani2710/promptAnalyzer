@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+  <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prompt Analyzer - Claude Optimizer</title>
+    <meta name="description" content="Analyze and improve your AI prompts for Claude, GPT-4, Gemini and Grok. Role-aware, category-aware scoring with real-time suggestions.">
+    <title>Prompt Analyzer — Multi-Model AI Prompt Optimizer</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -17,7 +18,7 @@
         <!-- Main Content -->
         <main class="main">
             <!-- Input Section -->
-            <section class="input-section">
+            <section class="input-section glass-card">
                 <h2>Paste Your Prompt</h2>
                 <textarea 
                     id="promptInput" 
@@ -26,11 +27,12 @@
                     rows="6"
                 ></textarea>
 
-                <!-- Model & Category Selection -->
+                <!-- Model, Role & Category Selection -->
                 <div class="controls">
                     <div class="control-group">
-                        <label for="modelSelect">Target AI Model:</label>
+                        <label for="modelSelect">🤖 Target AI Model:</label>
                         <select id="modelSelect">
+                            <option value="all">⚡ All Models</option>
                             <option value="claude">Claude (Anthropic)</option>
                             <option value="gpt4">GPT-4 (OpenAI)</option>
                             <option value="gemini">Gemini (Google)</option>
@@ -39,7 +41,19 @@
                     </div>
 
                     <div class="control-group">
-                        <label for="categorySelect">Category:</label>
+                        <label for="roleSelect">👤 Your Role:</label>
+                        <select id="roleSelect">
+                            <option value="general">General User</option>
+                            <option value="learner">📚 Learner / Student</option>
+                            <option value="researcher">🔬 Researcher</option>
+                            <option value="builder">🔧 Builder / Developer</option>
+                            <option value="creator">🎨 Creator / Writer</option>
+                            <option value="analyst">📊 Analyst</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="categorySelect">📁 Category:</label>
                         <select id="categorySelect">
                             <option value="auto">Auto-Detect</option>
                             <option value="creative">Creative Tasks</option>
@@ -67,67 +81,87 @@
                         <span class="score-number" id="overallScore">0</span>
                         <span class="score-label">/100</span>
                     </div>
+                    <div id="scoreBadge" class="score-badge badge-poor">Poor</div>
                     <div class="score-bar">
                         <div class="score-fill" id="scoreBar"></div>
                     </div>
                 </div>
 
-                <!-- Detected Category -->
-                <div class="info-box">
-                    <h3>Detected Information</h3>
-                    <p><strong>Category:</strong> <span id="detectedCategory">-</span></p>
-                    <p><strong>Model:</strong> <span id="detectedModel">Claude</span></p>
+                <div class="info-box glass-card">
+                    <p><strong>Category</strong> <span id="detectedCategory">-</span></p>
+                    <p><strong>Model</strong> <span id="detectedModel">-</span></p>
+                    <p><strong>Role</strong> <span id="detectedRole">-</span></p>
                 </div>
 
                 <!-- Scoring Breakdown -->
                 <div class="metrics-grid">
-                    <div class="metric-card">
+
+                    <div class="metric-card" id="metric-clarity">
                         <div class="metric-label">Clarity</div>
-                        <div class="metric-score" id="clarityScore">0%</div>
-                        <div class="metric-bar">
-                            <div class="metric-fill" id="clarityBar"></div>
+                        <div class="metric-circle-wrap">
+                            <svg class="metric-ring" viewBox="0 0 80 80">
+                                <circle class="ring-bg" cx="40" cy="40" r="32"/>
+                                <circle class="ring-fill" id="clarityRing" cx="40" cy="40" r="32"/>
+                            </svg>
+                            <div class="metric-score" id="clarityScore">0%</div>
                         </div>
                     </div>
 
-                    <div class="metric-card">
+                    <div class="metric-card" id="metric-specificity">
                         <div class="metric-label">Specificity</div>
-                        <div class="metric-score" id="specificityScore">0%</div>
-                        <div class="metric-bar">
-                            <div class="metric-fill" id="specificityBar"></div>
+                        <div class="metric-circle-wrap">
+                            <svg class="metric-ring" viewBox="0 0 80 80">
+                                <circle class="ring-bg" cx="40" cy="40" r="32"/>
+                                <circle class="ring-fill" id="specificityRing" cx="40" cy="40" r="32"/>
+                            </svg>
+                            <div class="metric-score" id="specificityScore">0%</div>
                         </div>
                     </div>
 
-                    <div class="metric-card">
+                    <div class="metric-card" id="metric-context">
                         <div class="metric-label">Context</div>
-                        <div class="metric-score" id="contextScore">0%</div>
-                        <div class="metric-bar">
-                            <div class="metric-fill" id="contextBar"></div>
+                        <div class="metric-circle-wrap">
+                            <svg class="metric-ring" viewBox="0 0 80 80">
+                                <circle class="ring-bg" cx="40" cy="40" r="32"/>
+                                <circle class="ring-fill" id="contextRing" cx="40" cy="40" r="32"/>
+                            </svg>
+                            <div class="metric-score" id="contextScore">0%</div>
                         </div>
                     </div>
 
-                    <div class="metric-card">
+                    <div class="metric-card" id="metric-constraints">
                         <div class="metric-label">Constraints</div>
-                        <div class="metric-score" id="constraintsScore">0%</div>
-                        <div class="metric-bar">
-                            <div class="metric-fill" id="constraintsBar"></div>
+                        <div class="metric-circle-wrap">
+                            <svg class="metric-ring" viewBox="0 0 80 80">
+                                <circle class="ring-bg" cx="40" cy="40" r="32"/>
+                                <circle class="ring-fill" id="constraintsRing" cx="40" cy="40" r="32"/>
+                            </svg>
+                            <div class="metric-score" id="constraintsScore">0%</div>
                         </div>
                     </div>
 
-                    <div class="metric-card">
+                    <div class="metric-card" id="metric-structure">
                         <div class="metric-label">Structure</div>
-                        <div class="metric-score" id="structureScore">0%</div>
-                        <div class="metric-bar">
-                            <div class="metric-fill" id="structureBar"></div>
+                        <div class="metric-circle-wrap">
+                            <svg class="metric-ring" viewBox="0 0 80 80">
+                                <circle class="ring-bg" cx="40" cy="40" r="32"/>
+                                <circle class="ring-fill" id="structureRing" cx="40" cy="40" r="32"/>
+                            </svg>
+                            <div class="metric-score" id="structureScore">0%</div>
                         </div>
                     </div>
 
-                    <div class="metric-card">
+                    <div class="metric-card" id="metric-completeness">
                         <div class="metric-label">Completeness</div>
-                        <div class="metric-score" id="completenessScore">0%</div>
-                        <div class="metric-bar">
-                            <div class="metric-fill" id="completenessBar"></div>
+                        <div class="metric-circle-wrap">
+                            <svg class="metric-ring" viewBox="0 0 80 80">
+                                <circle class="ring-bg" cx="40" cy="40" r="32"/>
+                                <circle class="ring-fill" id="completenessRing" cx="40" cy="40" r="32"/>
+                            </svg>
+                            <div class="metric-score" id="completenessScore">0%</div>
                         </div>
                     </div>
+
                 </div>
 
                 <!-- Issues Detected -->
@@ -138,12 +172,22 @@
                     </div>
                 </div>
 
+                <!-- Word Suggestion Chips -->
+                <div class="word-chips-section" id="wordChipsSection">
+                    <div class="word-chips-header" id="wordChipsHeader">
+                        <span>🔤</span>
+                        <h3>Word &amp; Phrase Suggestions</h3>
+                        <span class="chips-toggle">▼</span>
+                    </div>
+                    <div class="word-chips-body" id="wordChipsBody">
+                        <!-- Chips populated by JS -->
+                    </div>
+                </div>
+
                 <!-- Suggestions -->
                 <div class="suggestions-box">
                     <h3>✨ Suggested Improvement</h3>
-                    <div id="suggestionText" class="suggestion-text">
-                        <!-- Suggestion will be populated here -->
-                    </div>
+                    <div id="suggestionText" class="suggestion-text"></div>
                     <button class="btn btn-secondary" id="copySuggestionBtn">
                         📋 Copy Suggestion
                     </button>
@@ -175,12 +219,9 @@
             </div>
         </main>
 
-        <!-- Footer -->
         <footer class="footer">
-            <p>Prompt Analyzer MVP • Optimize prompts for better AI outputs</p>
-            <p style="font-size: 12px; color: #999; margin-top: 8px;">
-                Currently using mock analysis. Add your Claude API key to enable real analysis.
-            </p>
+            <p>Prompt Analyzer &bull; Multi-Model AI Prompt Optimizer</p>
+            <p>Pattern-based analysis &bull; Claude &bull; GPT-4 &bull; Gemini &bull; Grok</p>
         </footer>
     </div>
 

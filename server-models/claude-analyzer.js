@@ -2,8 +2,8 @@ const path = require('path');
 const patterns = require(path.join(__dirname, '../patterns/claude/patterns.json'));
 
 class ClaudeAnalyzer {
-    analyzePrompt(prompt, category) {
-        const metrics = this.calculateMetrics(prompt);
+    analyzePrompt(prompt, category, role) {
+        const metrics = this.calculateMetrics(prompt, category, role);
         const issues = this.detectIssues(prompt);
         const score = this.calculateOverallScore(metrics, prompt);
         const suggestion = this.generateSuggestion(prompt, issues);
@@ -18,8 +18,18 @@ class ClaudeAnalyzer {
             claudeTips,
             improvedPrompt,
             category: category === 'auto' ? this.detectCategory(prompt) : category,
-            model: 'claude'
+            model: 'claude',
+            role: role || 'general'
         };
+    }
+
+    // ─── Merge base weights with category then role overrides ─────────────────
+
+    getEffectiveWeights(category, role) {
+        const base   = { ...patterns.scoringWeights };
+        const catOvr = patterns.category_weight_overrides?.[category] || {};
+        const roleOvr = patterns.role_weight_overrides?.[role] || {};
+        return { ...base, ...catOvr, ...roleOvr };
     }
 
     // ─── Scoring via scoring_dimensions ────────────────────────────────────────
@@ -58,9 +68,9 @@ class ClaudeAnalyzer {
         return bonus;
     }
 
-    calculateMetrics(prompt) {
+    calculateMetrics(prompt, category, role) {
         const dims = patterns.scoring_dimensions;
-        const w = patterns.scoringWeights;
+        const w = this.getEffectiveWeights(category, role);
 
         // Map scoring_dimensions to the 6 metric slots
         const structureScore  = this.scoreDimension(prompt, dims.system_level_structuring);
