@@ -11,7 +11,7 @@
     <div class="container">
         <!-- Header -->
         <header class="header">
-            <h1>🚀 Prompt Analyzer</h1>
+            <h1>Prompt Analyzer</h1>
             <p>Analyze & Improve Your AI Prompts for Maximum Accuracy</p>
         </header>
 
@@ -30,9 +30,9 @@
                 <!-- Model, Role & Category Selection -->
                 <div class="controls">
                     <div class="control-group">
-                        <label for="modelSelect">🤖 Target AI Model:</label>
+                        <label for="modelSelect">Target AI Model:</label>
                         <select id="modelSelect">
-                            <option value="all">⚡ All Models</option>
+                            <option value="all">All Models</option>
                             <option value="claude">Claude (Anthropic)</option>
                             <option value="gpt4">GPT-4 (OpenAI)</option>
                             <option value="gemini">Gemini (Google)</option>
@@ -41,7 +41,7 @@
                     </div>
 
                     <div class="control-group">
-                        <label for="roleSelect">👤 Your Role:</label>
+                        <label for="roleSelect"> Your Role:</label>
                         <select id="roleSelect">
                             <option value="general">General User</option>
                             <option value="learner">📚 Learner / Student</option>
@@ -53,7 +53,7 @@
                     </div>
 
                     <div class="control-group">
-                        <label for="categorySelect">📁 Category:</label>
+                        <label for="categorySelect">Category:</label>
                         <select id="categorySelect">
                             <option value="auto">Auto-Detect</option>
                             <option value="creative">Creative Tasks</option>
@@ -69,7 +69,7 @@
 
                 <!-- Analyze Button -->
                 <button id="analyzeBtn" class="btn btn-primary">
-                    📊 Analyze Prompt
+                    Analyze Prompt
                 </button>
             </section>
 
@@ -166,7 +166,7 @@
 
                 <!-- Issues Detected -->
                 <div class="issues-box">
-                    <h3>🔴 Issues Detected</h3>
+                    <h3> Issues Detected</h3>
                     <div id="issuesList" class="issues-list">
                         <!-- Issues will be populated here -->
                     </div>
@@ -186,16 +186,16 @@
 
                 <!-- Suggestions -->
                 <div class="suggestions-box">
-                    <h3>✨ Suggested Improvement</h3>
+                    <h3> Suggested Improvement</h3>
                     <div id="suggestionText" class="suggestion-text"></div>
                     <button class="btn btn-secondary" id="copySuggestionBtn">
-                        📋 Copy Suggestion
+                         Copy Suggestion
                     </button>
                 </div>
 
                 <!-- Claude-Specific Tips -->
                 <div class="tips-box">
-                    <h3>💡 AI Model Tips</h3>
+                    <h3> AI Model Tips</h3>
                     <ul id="claudeTips">
                         <!-- Tips will be populated here -->
                     </ul>
