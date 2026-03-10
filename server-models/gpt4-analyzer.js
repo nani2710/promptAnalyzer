@@ -138,64 +138,81 @@ class GPT4Analyzer {
         return str.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
     }
 
-    // ─── Suggestion Builder ─────────────────────────────────────────────────────
-
+    // ─── Suggestion Builder — returns improved prompt directly ────────────────
     generateSuggestion(prompt, issues) {
-        let s = prompt;
-        if (!/^(you are|act as)/i.test(prompt)) {
-            s = `You are a helpful expert assistant.\n\n${s}`;
-        }
-        if (!/\b(audience|beginner|expert|professional|executive)\b/i.test(s)) {
-            s += `\n\nAudience: Intermediate-level professionals.`;
-        }
-        if (!/\b(format|JSON|list|bullet|markdown|table)\b/i.test(s)) {
-            s += `\n\nFormat: Structured markdown with clear sections.`;
-        }
-        if (!/\b(\d+\s*(words|tokens|lines))\b/i.test(s)) {
-            s += `\n\nLength: 200-300 words maximum.`;
-        }
-        if (!/example|instance|for example|sample/i.test(s)) {
-            s += `\n\nInclude 1-2 concrete examples to illustrate key points.`;
-        }
-        return s;
+        return this.improvePrompt(prompt, issues);
     }
 
-    // ─── Tips: per-prompt dynamic + static from JSON ───────────────────────────
-
-    getModelTips(prompt) {
-        const extra = [];
-        const dims = patterns.scoring_dimensions;
-
-        for (const [, dim] of Object.entries(dims)) {
-            for (const pat of dim.patterns) {
-                try {
-                    if (!new RegExp(pat.regex, 'i').test(prompt)) {
-                        extra.push(`\uD83D\uDCA1 ${pat.description}`);
-                        break; // One tip per dimension max
-                    }
-                } catch (e) {}
-            }
-        }
-
-        const staticTips = (patterns.tips || []).map(t => `\u2713 ${t}`);
-        return [...extra, ...staticTips].slice(0, 5);
-    }
-
-    // ─── Prompt Improvement ─────────────────────────────────────────────────────
-
+    // ─── Prompt Improvement — GPT-4 optimised ≥90% rewrite ───────────────────
     improvePrompt(prompt, issues) {
-        let improved = prompt;
-        const vagueWords = ['good','nice','cool','interesting','big','small','really','very','kind of','sort of'];
-        vagueWords.forEach(word => {
-            const regex = new RegExp(`\\b${word}\\b`, 'gi');
-            if (regex.test(improved)) improved = improved.replace(regex, `[BE SPECIFIC INSTEAD OF "${word}"]`);
-        });
+        const p = prompt.trim();
 
-        if (issues.length > 2) {
-            improved = `You are an expert assistant.\n\n${prompt}\n\nRequirements:\n- Audience: Intermediate professionals\n- Format: Markdown with subheadings\n- Length: 200-300 words\n- Tone: Professional and direct\n- Include: 1-2 concrete examples\n- Avoid: Jargon, repetition, filler\n\nThink step-by-step before responding.`;
+        // ── 1. Role prefix ────────────────────────────────────────────────────
+        let rolePrefix = '';
+        if (!/^(you are|act as|assume you|take on the role|imagine you)/i.test(p)) {
+            rolePrefix = 'You are an expert assistant with deep specialised knowledge.\n\n';
         }
-        return improved;
+
+        // ── 2. Strip vague words ──────────────────────────────────────────────
+        const vagueMap = {
+            'good': 'high-quality', 'nice': 'refined', 'cool': 'impressive',
+            'interesting': 'noteworthy', 'big': 'significant', 'small': 'minimal',
+            'really': '', 'very': 'highly', 'kind of': '', 'sort of': '',
+            'things': 'elements', 'stuff': 'details'
+        };
+        let core = p;
+        for (const [vague, precise] of Object.entries(vagueMap)) {
+            core = core.replace(new RegExp(`\\b${vague}\\b`, 'gi'),
+                precise ? precise : '').replace(/\s{2,}/g, ' ');
+        }
+
+        // ── 3. Detect what already exists ────────────────────────────────────
+        const hasRole       = /^(you are|act as)/i.test(core);
+        const hasFormat     = /\b(json|markdown|bullet|numbered|table|list|format:|output:)\b/i.test(core);
+        const hasWordLimit  = /\d+[\s-]*(words|lines|tokens|characters)/i.test(core);
+        const hasTone       = /\b(tone:|professional|formal|casual|concise|direct|clear)\b/i.test(core);
+        const hasAudience   = /\b(audience|beginner|expert|professional|executive|intermediate)\b/i.test(core);
+        const hasExample    = /\b(example:|for example|such as|sample:|e\.g\.|like this:)\b/i.test(core);
+        const hasReasoning  = /\b(step.by.step|analyze|reason|break.?down|examine|evaluate|explain.*approach)\b/i.test(core);
+        const hasFewShot    = /\b(example:|for example|sample output|like this:|e\.g\.|given this)\b/i.test(core);
+        const hasAvoid      = /\b(avoid|do not|don't|exclude|without|no filler)\b/i.test(core);
+
+        // ── 4. Build suffix — only add what's missing ────────────────────────
+        const suffix = [];
+
+        if (!hasFewShot) {
+            suffix.push('Example output format: [Provide a 1-2 line sample showing the expected structure].');
+        }
+        if (!hasFormat) {
+            suffix.push('Format: Structured markdown — numbered sections with sub-bullets.');
+        }
+        if (!hasWordLimit) {
+            suffix.push('Length: 200–350 words.');
+        }
+        if (!hasTone) {
+            suffix.push('Tone: Professional, precise, and direct.');
+        }
+        if (!hasAudience) {
+            suffix.push('Target audience: Intermediate professionals familiar with the subject.');
+        }
+        if (!hasAvoid) {
+            suffix.push('Avoid: Repetition, filler phrases, and unsupported generalisations.');
+        }
+        if (!hasReasoning) {
+            suffix.push('Think through each point step-by-step before writing the final answer.');
+        }
+        // GPT-4 bonus: persona sharpening
+        if (!hasRole) {
+            suffix.push('Adopt the persona of a senior expert responding to a professional peer.');
+        }
+
+        const suffixBlock = suffix.length > 0
+            ? '\n\n' + suffix.map(s => `- ${s}`).join('\n')
+            : '';
+
+        return `${rolePrefix}${core}${suffixBlock}`.trim();
     }
+
 
     // ─── Helpers ────────────────────────────────────────────────────────────────
 

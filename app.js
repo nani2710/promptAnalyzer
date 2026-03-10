@@ -215,13 +215,29 @@ function displayResults(data) {
     // Display issues
     displayIssues(issues);
 
-    // Display suggestion
+    // Display suggestion (which IS the improved prompt)
     const suggestionText = document.getElementById('suggestionText');
     suggestionText.textContent = suggestion;
     suggestionText.dataset.suggestion = suggestion;
 
-    // Store improved prompt for later use
+    // Store improved prompt
     useImprovedBtn.dataset.improvedPrompt = improvedPrompt;
+
+    // Show suggestion score badge
+    const scoreBadge = document.getElementById('suggestionScoreBadge');
+    if (data.suggestionScore !== null && data.suggestionScore !== undefined) {
+        const ss = data.suggestionScore;
+        const color = ss >= 90 ? '#34d399' : ss >= 70 ? '#60a5fa' : '#fbbf24';
+        const label = ss >= 90 ? 'Excellent' : ss >= 70 ? 'Good' : 'Needs Work';
+        scoreBadge.style.display = 'inline-flex';
+        scoreBadge.style.alignItems = 'center';
+        scoreBadge.style.gap = '6px';
+        scoreBadge.style.marginBottom = '10px';
+        scoreBadge.innerHTML = `<span style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:${color};background:${color}18;border:1px solid ${color}55;padding:4px 12px;border-radius:50px;">This suggestion scores ${ss}/100 — ${label}</span>`;
+    } else {
+        scoreBadge.style.display = 'none';
+    }
+
 
     // Display model-specific tips
     displayClaudeTips(claudeTips);

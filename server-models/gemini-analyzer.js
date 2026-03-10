@@ -135,36 +135,85 @@ class GeminiAnalyzer {
     }
 
     generateSuggestion(prompt, issues) {
-        let s = prompt;
-        if (!/^(you are|act as)/i.test(prompt)) s = `You are a helpful Google AI expert.\n\n${s}`;
-        if (!/\b(audience|beginner|expert)\b/i.test(s)) s += `\n\nTarget audience: Intermediate users.`;
-        if (!/\b(format|JSON|list|bullet|schema)\b/i.test(s)) s += `\n\nReturn a structured JSON response with schema: { "summary": string, "details": string[], "confidence": string }`;
-        if (!/\b(\d+\s*(words|lines))\b/i.test(s)) s += `\n\nLimit to 200 words.`;
-        return s;
+        return this.improvePrompt(prompt, issues);
     }
 
     getModelTips(prompt) {
-        const tips = [...patterns.tips];
+        const tips = [...(patterns.tips || [])];
         const extra = [];
         if (!/image|photo|video|audio/i.test(prompt)) extra.push('💡 Gemini is natively multimodal — you can attach images, audio, or video alongside your text prompt');
         if (!/search|current|latest|grounding/i.test(prompt)) extra.push('💡 Enable Google Search grounding for real-time, factual answers');
         if (!/JSON|schema|structured/i.test(prompt)) extra.push('💡 Specify a JSON schema for reliable structured output from Gemini');
-        if (!/you are|act as/i.test(prompt)) extra.push('💡 Set a clear role: "You are a Google Cloud architect with expertise in Kubernetes"');
+        if (!/you are|act as/i.test(prompt)) extra.push('💡 Set a clear role: "You are a Google Cloud architect with expertise in AI"');
         if (/please|could you/i.test(prompt)) extra.push('💡 Remove conversational filler for cleaner instructions');
         return [...extra, ...tips].slice(0, 5);
     }
 
     improvePrompt(prompt, issues) {
-        let improved = prompt;
-        const vagueWords = ['good','nice','cool','interesting','big','small','really','very','kind of','sort of'];
-        vagueWords.forEach(word => {
-            const regex = new RegExp(`\\b${word}\\b`, 'gi');
-            if (regex.test(improved)) improved = improved.replace(regex, `[BE SPECIFIC INSTEAD OF "${word}"]`);
-        });
-        if (issues.length > 2) {
-            improved = `You are a helpful AI expert.\n\n${prompt}\n\nRequirements:\n- Target audience: Intermediate users\n- Format: JSON schema { "answer": string, "steps": string[], "sources": string[] }\n- Tone: Accurate and grounded\n- Length: Concise (200-400 words)\n\nUse Google Search grounding for factual accuracy.`;
+        const p = prompt.trim();
+
+        // ── 1. Role prefix ────────────────────────────────────────────────────
+        let rolePrefix = '';
+        if (!/^(you are|act as|assume you|take on the role)/i.test(p)) {
+            rolePrefix = 'You are a knowledgeable and accurate AI assistant.\n\n';
         }
-        return improved;
+
+        // ── 2. Strip vague words ──────────────────────────────────────────────
+        const vagueMap = {
+            'good': 'accurate', 'nice': 'well-structured', 'cool': 'effective',
+            'interesting': 'significant', 'big': 'extensive', 'small': 'concise',
+            'really': '', 'very': 'highly', 'kind of': '', 'sort of': '',
+            'things': 'elements', 'stuff': 'details', 'thing': 'element'
+        };
+        let core = p;
+        for (const [vague, precise] of Object.entries(vagueMap)) {
+            core = core.replace(new RegExp(`\\b${vague}\\b`, 'gi'),
+                precise ? precise : '').replace(/\s{2,}/g, ' ');
+        }
+
+        // ── 3. Detect what already exists ────────────────────────────────────
+        const hasFormat     = /\b(json|xml|markdown|schema|bullet|numbered|table|list|format:|output:)\b/i.test(core);
+        const hasWordLimit  = /\d+[\s-]*(words|lines|sentences|characters|paragraphs)/i.test(core);
+        const hasTone       = /\b(tone:|professional|formal|casual|technical|beginner-friendly|simple)\b/i.test(core);
+        const hasAudience   = /\b(audience|beginner|expert|student|professional|user|reader)\b/i.test(core);
+        const hasAvoid      = /\b(avoid|don't|exclude|limit|no more than|maximum|minimum)\b/i.test(core);
+        const hasStructure  = /\b(structure:|sections:|1\.|2\.|outline|introduction|context)\b/i.test(core);
+        const hasSpecific   = /\b(specific|detail|include|mention|focus|function|api|json|sql|algorithm)\b/i.test(core);
+        const hasGrounding  = /\b(search|current|latest|grounding|real-time|factual)\b/i.test(core);
+
+        // ── 4. Build suffix ───────────────────────────────────────────────────
+        const suffix = [];
+
+        if (!hasFormat) {
+            suffix.push('Format: Return a structured markdown response with clearly labeled sections.');
+        }
+        if (!hasWordLimit) {
+            suffix.push('Length: 250–400 words.');
+        }
+        if (!hasTone) {
+            suffix.push('Tone: Accurate, grounded, and informative.');
+        }
+        if (!hasAudience) {
+            suffix.push('Target audience: Professionals with intermediate domain knowledge.');
+        }
+        if (!hasAvoid) {
+            suffix.push('Avoid: Unverified claims, vague generalisations, and filler content.');
+        }
+        if (!hasStructure) {
+            suffix.push('Structure each section clearly with headers and sub-points.');
+        }
+        if (!hasSpecific) {
+            suffix.push('Include specific, concrete examples with measurable details.');
+        }
+        if (!hasGrounding) {
+            suffix.push('Base your response on factual, verifiable information.');
+        }
+
+        const suffixBlock = suffix.length > 0
+            ? '\n\n' + suffix.map(s => `- ${s}`).join('\n')
+            : '';
+
+        return `${rolePrefix}${core}${suffixBlock}`.trim();
     }
 
     calculateOverallScore(metrics) {

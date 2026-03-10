@@ -26,12 +26,25 @@ app.post('/api/analyze', (req, res) => {
         const analyzer = getAnalyzer(model || 'claude');
         const analysis = analyzer.analyzePrompt(prompt, category || 'auto', role || 'general');
 
+        // Score the improved prompt so frontend can show "This suggestion scores X/100"
+        if (analysis.improvedPrompt && analysis.improvedPrompt !== prompt) {
+            const suggestionAnalysis = analyzer.analyzePrompt(
+                analysis.improvedPrompt,
+                analysis.category,
+                role || 'general'
+            );
+            analysis.suggestionScore = Math.round(suggestionAnalysis.score);
+        } else {
+            analysis.suggestionScore = null;
+        }
+
         res.json(analysis);
     } catch (error) {
         console.error('Analysis error:', error);
         res.status(500).json({ error: 'Failed to analyze prompt' });
     }
 });
+
 
 /**
  * Health Check

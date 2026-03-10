@@ -142,70 +142,107 @@ class ClaudeAnalyzer {
         return str.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
     }
 
-    // ─── Suggestion Builder ─────────────────────────────────────────────────────
 
+    // ─── Suggestion Builder — returns the improved prompt directly ────────────
     generateSuggestion(prompt, issues) {
-        let s = prompt;
-        if (!/^(you are|act as|assume you|take on the role)/i.test(prompt)) {
-            s = `You are a helpful expert.\n\n${s}`;
-        }
-        if (!/\b(audience|beginner|expert|student|professional)\b/i.test(s)) {
-            s += `\n\nTarget audience: Beginners with basic understanding.`;
-        }
-        if (!/\b(format|JSON|list|bullet|markdown|numbered)\b/i.test(s)) {
-            s += `\n\nFormat: Structured numbered list with clear explanations.`;
-        }
-        if (!/\b(\d+\s*(words|lines|sentences))\b/i.test(s)) {
-            s += `\n\nLength: Under 200 words.`;
-        }
-        if (!/step.by.step|reason|think|analyze/i.test(s)) {
-            s += `\n\nThink step-by-step before responding.`;
-        }
-        return s;
+        return this.improvePrompt(prompt, issues);
     }
 
-    // ─── Tips from patterns.tips + dynamic additions ────────────────────────────
-
+    // ─── Tips from patterns.tips + dynamic additions ──────────────────────────
     getModelTips(prompt) {
         const extra = [];
-
-        // Dynamic per-prompt tips from scoring_dimensions
         const dims = patterns.scoring_dimensions;
         for (const [, dim] of Object.entries(dims)) {
             for (const pat of dim.patterns) {
                 try {
                     if (!new RegExp(pat.regex, 'i').test(prompt)) {
                         extra.push(`\uD83D\uDCA1 ${pat.description}`);
-                        break; // One tip per dimension
+                        break;
                     }
                 } catch (e) {}
             }
         }
-
-        // Static tips from JSON
         const staticTips = (patterns.tips || []).map(t => `\u2713 ${t}`);
         return [...extra, ...staticTips].slice(0, 5);
     }
 
-    // ─── Prompt Improvement ─────────────────────────────────────────────────────
-
+    // ─── Prompt Improvement — Claude-optimised ≥90% rewrite ───────────────────
     improvePrompt(prompt, issues) {
-        let improved = prompt;
-        const vagueWords = ['good','nice','cool','interesting','big','small','really','very','kind of','sort of'];
-        vagueWords.forEach(word => {
-            const regex = new RegExp(`\\b${word}\\b`, 'gi');
-            if (regex.test(improved)) improved = improved.replace(regex, `[BE SPECIFIC INSTEAD OF "${word}"]`);
-        });
+        const p = prompt.trim();
 
-        if (issues.length > 2) {
-            // Use the excellent example structure from patterns as template
-            improved = `You are an expert assistant.\n\n${prompt}\n\nStructure:\n1. Key points (2-3 sentences)\n2. Supporting details (specific examples)\n3. Actionable takeaway\n\nTone: Professional and clear\nLength: 150-250 words\nFormat: Numbered sections\nAvoid: Jargon without explanation, vague generalities\n\nThink step-by-step before responding.`;
+        // ── 1. Extract or build the role line ─────────────────────────────────
+        let rolePrefix = '';
+        if (/^(you are|act as|assume you|take on the role)/i.test(p)) {
+            rolePrefix = '';           // already has role — keep as-is at top
+        } else {
+            rolePrefix = 'You are an expert professional with deep domain knowledge.\n\n';
         }
-        return improved;
+
+        // ── 2. Strip vague words ──────────────────────────────────────────────
+        const vagueMap = {
+            'good': 'effective', 'nice': 'precise', 'cool': 'innovative',
+            'interesting': 'significant', 'big': 'large-scale', 'small': 'concise',
+            'really': '', 'very': 'exceptionally', 'kind of': '', 'sort of': '',
+            'things': 'elements', 'stuff': 'components'
+        };
+        let core = p;
+        for (const [vague, precise] of Object.entries(vagueMap)) {
+            core = core.replace(new RegExp(`\\b${vague}\\b`, 'gi'),
+                precise ? precise : '').replace(/\s{2,}/g, ' ');
+        }
+
+        // ── 3. Detect what the prompt already has ────────────────────────────
+        const hasFormat     = /\b(json|xml|markdown|bullet|numbered list|table|format:|output:)\b/i.test(core);
+        const hasWordLimit  = /\d+[\s-]*(words|lines|sentences|characters|tokens)/i.test(core);
+        const hasTone       = /\b(tone:|style:|professional|formal|casual|concise|technical|scholarly)\b/i.test(core);
+        const hasAudience   = /\b(audience|beginner|expert|student|professional|executive|target)\b/i.test(core);
+        const hasAvoid      = /\b(avoid|do not|don't|exclude|without)\b/i.test(core);
+        const hasStepByStep = /step.by.step|reason|think through|analyze|conduct|evaluate|examine/i.test(core);
+        const hasConstraint = /\b(constraint|limit|boundary|must|should|cannot|rule)\b/i.test(core);
+        const hasStructure  = /\b(structure:|sections:|1\.|2\.|components:|parts:)\b/i.test(core);
+
+        // ── 4. Build the suffix block — only add what's missing ──────────────
+        const suffix = [];
+
+        if (!hasStructure && !hasFormat) {
+            suffix.push('Structure your response with clearly labeled sections.');
+        }
+        if (!hasFormat) {
+            suffix.push('Format: Markdown with numbered sections and sub-bullets.');
+        }
+        if (!hasWordLimit) {
+            suffix.push('Length: 250–400 words.');
+        }
+        if (!hasTone) {
+            suffix.push('Tone: Professional, clear, and evidence-based.');
+        }
+        if (!hasAudience) {
+            suffix.push('Target audience: Professionals with intermediate background knowledge.');
+        }
+        if (!hasAvoid) {
+            suffix.push('Avoid: Jargon without explanation, generic filler, vague claims.');
+        }
+        if (!hasConstraint) {
+            suffix.push('Constraint: Focus only on what is directly asked — do not over-expand.');
+        }
+        if (!hasStepByStep) {
+            suffix.push('Reasoning: Analyze each point step-by-step before presenting your findings.');
+        }
+
+        // Bonus: impact signal for Claude constitutional AI scoring
+        if (!/\b(impact|consider|implication|ethical|value)\b/i.test(core)) {
+            suffix.push('Highlight the practical impact and key implications of each point.');
+        }
+
+        // ── 5. Assemble the final improved prompt ─────────────────────────────
+        const suffixBlock = suffix.length > 0
+            ? '\n\n' + suffix.map(s => `- ${s}`).join('\n')
+            : '';
+
+        return `${rolePrefix}${core}${suffixBlock}`.trim();
     }
 
-    // ─── Overall Score ──────────────────────────────────────────────────────────
-
+    // ─── Category Detection ───────────────────────────────────────────────────
     detectCategory(prompt) {
         const p = prompt.toLowerCase();
         if (/write|story|essay|poem|creative|narrative|dialogue|character/i.test(p)) return 'creative';
@@ -220,3 +257,4 @@ class ClaudeAnalyzer {
 }
 
 module.exports = ClaudeAnalyzer;
+

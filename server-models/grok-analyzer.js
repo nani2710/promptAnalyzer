@@ -24,8 +24,8 @@ class GrokAnalyzer {
     }
 
     getEffectiveWeights(category, role) {
-        const base    = { ...patterns.scoringWeights };
-        const catOvr  = patterns.category_weight_overrides?.[category] || {};
+        const base = { ...patterns.scoringWeights };
+        const catOvr = patterns.category_weight_overrides?.[category] || {};
         const roleOvr = patterns.role_weight_overrides?.[role] || {};
         return { ...base, ...catOvr, ...roleOvr };
     }
@@ -36,11 +36,11 @@ class GrokAnalyzer {
         const w = this.getEffectiveWeights(category, role);
 
         return {
-            clarity:      Math.min(100, this.calcClarity(prompt, words) * w.clarity),
-            specificity:  Math.min(100, this.calcSpecificity(prompt, words) * w.specificity),
-            context:      Math.min(100, this.calcContext(prompt, words) * w.context),
-            constraints:  Math.min(100, this.calcConstraints(prompt) * w.constraints),
-            structure:    Math.min(100, this.calcStructure(prompt, sentences) * w.structure),
+            clarity: Math.min(100, this.calcClarity(prompt, words) * w.clarity),
+            specificity: Math.min(100, this.calcSpecificity(prompt, words) * w.specificity),
+            context: Math.min(100, this.calcContext(prompt, words) * w.context),
+            constraints: Math.min(100, this.calcConstraints(prompt) * w.constraints),
+            structure: Math.min(100, this.calcStructure(prompt, sentences) * w.structure),
             completeness: Math.min(100, this.calcCompleteness(prompt) * w.completeness)
         };
     }
@@ -56,7 +56,7 @@ class GrokAnalyzer {
     }
 
     calcSpecificity(prompt, words) {
-        const vague = ['good','nice','cool','interesting','big','small','thing','stuff','really','very'];
+        const vague = ['good', 'nice', 'cool', 'interesting', 'big', 'small', 'thing', 'stuff', 'really', 'very'];
         const vagueCount = vague.filter(w => prompt.toLowerCase().includes(w)).length;
         let v = 70;
         v -= vagueCount * 8;
@@ -130,35 +130,83 @@ class GrokAnalyzer {
     }
 
     generateSuggestion(prompt, issues) {
-        let s = prompt;
-        if (!/^(you are|act as)/i.test(prompt)) s = `You are a direct, no-fluff AI assistant.\n\n${s}`;
-        if (!/brief|short|direct|concise|tldr/i.test(s)) s += `\n\nBe direct and concise. No fluff.`;
-        if (!/honest|blunt|don't sugarcoat/i.test(s)) s += `\n\nBe completely honest — don't sugarcoat.`;
-        return s;
+        return this.improvePrompt(prompt, issues);
     }
 
     getModelTips(prompt) {
-        const tips = [...patterns.tips];
+        const tips = [...(patterns.tips || [])];
         const extra = [];
         if (!/current|latest|X|Twitter|real-time|today/i.test(prompt)) extra.push('💡 Grok has live X (Twitter) access — frame prompts around current events or trending topics');
         if (!/brief|direct|tldr|no fluff|concise/i.test(prompt)) extra.push('💡 Add "Be direct, no fluff" — this matches Grok\'s natural style perfectly');
-        if (!/honest|blunt|don\'t sugarcoat/i.test(prompt)) extra.push('💡 Say "Don\'t sugarcoat this analysis" for Grok\'s unfiltered take');
+        if (!/honest|blunt|don\'t sugarcoat/i.test(prompt)) extra.push('💡 Say "Don\'t sugarcoat this" for Grok\'s unfiltered take');
         if (!/funny|witty|humor|sarcastic/i.test(prompt)) extra.push('💡 Grok handles wit — add "with humor" or "in a witty tone" for engaging responses');
         if (/please|could you|would you/i.test(prompt)) extra.push('💡 Skip the pleasantries — Grok is built for directness');
         return [...extra, ...tips].slice(0, 5);
     }
 
     improvePrompt(prompt, issues) {
-        let improved = prompt;
-        const vagueWords = ['good','nice','cool','interesting','big','small','really','very','kind of','sort of'];
-        vagueWords.forEach(word => {
-            const regex = new RegExp(`\\b${word}\\b`, 'gi');
-            if (regex.test(improved)) improved = improved.replace(regex, `[BE SPECIFIC INSTEAD OF "${word}"]`);
-        });
-        if (issues.length > 2) {
-            improved = `${prompt}\n\nRules:\n- Be direct and concise\n- No fluff or filler\n- Don't sugarcoat\n- Max 3 bullet points or 100 words\n- Use real-time X data if relevant`;
+        const p = prompt.trim();
+
+        // ── 1. Role prefix (only if missing) ───────────────────────────
+        let rolePrefix = '';
+        if (!/^(you are|act as|assume you|take on the role)/i.test(p)) {
+            rolePrefix = 'You are a direct, no-nonsense expert assistant.\n\n';
         }
-        return improved;
+
+        // ── 2. Strip vague words ─────────────────────────────────────────
+        const vagueMap = {
+            'good': 'sharp', 'nice': 'clean', 'cool': 'solid', 'really': '',
+            'interesting': 'notable', 'big': 'significant', 'small': 'tight',
+            'very': '', 'kind of': '', 'sort of': '', 'things': 'points',
+            'stuff': 'details', 'thing': 'point'
+        };
+        let core = p;
+        for (const [vague, precise] of Object.entries(vagueMap)) {
+            core = core.replace(new RegExp(`\\b${vague}\\b`, 'gi'),
+                precise ? precise : '').replace(/\s{2,}/g, ' ');
+        }
+        // Remove politeness — Grok penalises it
+        core = core.replace(/\b(please|could you|would you|kindly|if possible)\b[,]?/gi, '').replace(/\s{2,}/g, ' ').trim();
+
+        // ── 3. Detect what already exists ─────────────────────────────────
+        const hasBrevity = /\b(brief|short|concise|direct|tldr|no fluff|\d+\s*(words|sentences|bullets|points))\b/i.test(core);
+        const hasHonesty = /\b(honest|blunt|don't sugarcoat|frank|no fluff|straight)\b/i.test(core);
+        const hasConstraint = /\b(\d+\s*(words|lines|points|bullets|sentences)|limit|max|under \d+)\b/i.test(core);
+        const hasAvoid = /\b(avoid|don't|no filler|skip|exclude|no more than)\b/i.test(core);
+        const hasFocus = /\b(focus|specific|only|just|narrow|exactly)\b/i.test(core);
+        const hasFormat = /\b(bullet|numbered|list|markdown|table|format:|output:)\b/i.test(core);
+        const hasTone = /\b(tone:|professional|casual|direct|blunt|witty|sarcastic)\b/i.test(core);
+
+        // ── 4. Build suffix ───────────────────────────────────────────────────
+        const suffix = [];
+
+        if (!hasBrevity) {
+            suffix.push('Be concise and direct — no filler, no fluff.');
+        }
+        if (!hasHonesty) {
+            suffix.push("Be completely honest — don't sugarcoat or hedge unnecessarily.");
+        }
+        if (!hasConstraint) {
+            suffix.push('Limit your response to 150–250 words or fewer.');
+        }
+        if (!hasAvoid) {
+            suffix.push('Avoid: generic advice, filler phrases, excessive caveats.');
+        }
+        if (!hasFocus) {
+            suffix.push('Focus only on what is directly asked — do not over-explain.');
+        }
+        if (!hasFormat) {
+            suffix.push('Format: Use bullet points for clarity where applicable.');
+        }
+        if (!hasTone) {
+            suffix.push('Tone: Direct and professional.');
+        }
+
+        const suffixBlock = suffix.length > 0
+            ? '\n\n' + suffix.map(s => `- ${s}`).join('\n')
+            : '';
+
+        return `${rolePrefix}${core}${suffixBlock}`.trim();
     }
 
     calculateOverallScore(metrics) {

@@ -120,8 +120,8 @@ body::after {
 
 .header h1 {
   font-size: clamp(2rem, 5vw, 3.2rem);
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  font-weight: 900;
+  letter-spacing: -0.03em;
   background: linear-gradient(135deg, #c4b5fd 0%, #93c5fd 50%, #67e8f9 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -131,9 +131,9 @@ body::after {
 }
 
 .header p {
-  font-size: 1.05rem;
+  font-size: 1.08rem;
   color: var(--text-secondary);
-  font-weight: 400;
+  font-weight: 500;
   letter-spacing: 0.01em;
 }
 
@@ -157,14 +157,14 @@ body::after {
   margin-bottom: 32px;
   padding: 32px;
 }
-.input-section.glass-card { /* apply glass to the section */ }
+/* .input-section inherits .glass-card styles */
 
 .input-section h2 {
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 800;
   color: var(--text-secondary);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   margin-bottom: 16px;
 }
 
@@ -174,16 +174,18 @@ body::after {
   background: rgba(255,255,255,0.05);
   border: 1.5px solid var(--glass-border);
   border-radius: var(--radius-md);
-  color: var(--text-primary);
+  color: #ffffff;
   font-family: 'JetBrains Mono', monospace;
   font-size: 13.5px;
+  font-weight: 500;
   line-height: 1.7;
   resize: vertical;
   min-height: 140px;
   transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
   outline: none;
 }
-.prompt-input::placeholder { color: var(--text-muted); }
+.prompt-input::placeholder { color: #6b7fa3; opacity: 1; }
+
 .prompt-input:focus {
   border-color: var(--accent-purple);
   background: rgba(167,139,250,0.06);
@@ -201,10 +203,10 @@ body::after {
 .control-group label {
   display: block;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 800;
   color: var(--text-secondary);
   text-transform: uppercase;
-  letter-spacing: 0.07em;
+  letter-spacing: 0.1em;
   margin-bottom: 8px;
 }
 
@@ -248,11 +250,11 @@ body::after {
   border: none;
   border-radius: 50px;
   font-family: 'Inter', sans-serif;
-  font-size: 0.92rem;
-  font-weight: 600;
+  font-size: 0.95rem;
+  font-weight: 800;
   cursor: pointer;
   transition: all 0.25s ease;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
 }
 
 .btn-primary {
@@ -323,12 +325,15 @@ body::after {
 
 .score-number {
   font-size: clamp(4rem, 12vw, 7rem);
-  font-weight: 800;
+  font-weight: 900;
   letter-spacing: -0.04em;
   line-height: 1;
-  color: var(--score-color, #a78bfa);
+  color: #ffffff;
+  text-shadow:
+    0 2px 4px rgba(0,0,0,0.6),
+    0 4px 24px rgba(0,0,0,0.5),
+    0 0 60px rgba(255,255,255,0.15);
   transition: color 0.6s ease;
-  text-shadow: 0 0 40px rgba(167,139,250,0.4);
 }
 
 .score-label {
@@ -346,13 +351,13 @@ body::after {
   gap: 6px;
   padding: 6px 18px;
   border-radius: 50px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   margin-bottom: 28px;
   border: 1px solid currentColor;
-  opacity: 0.9;
+  opacity: 0.95;
 }
 .score-badge.badge-excellent { color: var(--accent-green); background: rgba(52,211,153,0.1); }
 .score-badge.badge-good      { color: var(--accent-blue);  background: rgba(96,165,250,0.1); }
@@ -425,37 +430,26 @@ body::after {
 }
 
 .metric-card {
-  padding: 20px 18px;
+  padding: 16px 12px;
   border-radius: var(--radius-lg);
-  border: 1px solid var(--glass-border);
-  background: var(--bg-card);
-  transition: all 0.3s ease;
+  border: none;
+  background: transparent;
+  transition: transform 0.3s ease;
   position: relative;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
-.metric-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: var(--metric-accent, var(--accent-purple));
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-.metric-card:hover::before { opacity: 1; }
 .metric-card:hover {
-  border-color: var(--glass-border-h);
-  transform: translateY(-2px);
+  transform: translateY(-3px);
 }
 
 .metric-label {
   font-size: 0.72rem;
-  font-weight: 600;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
   margin-bottom: 10px;
 }
 
